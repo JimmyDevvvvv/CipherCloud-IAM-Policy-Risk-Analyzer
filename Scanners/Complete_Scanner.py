@@ -7,6 +7,8 @@ import sys
 import os
 from datetime import datetime
 import time
+import pickle
+from io import BytesIO
 
 # Binary Feature Extractor (from your Binary.py)
 class IAMFeatureExtractor:
@@ -203,9 +205,29 @@ class CompleteCipherCloudScanner:
         
         print("🔄 Loading CipherCloud AI Models...")
         
+        # Custom unpickler to handle incompatible dtype
+        def custom_load(file_path):
+            with open(file_path, 'rb') as f:
+                data = pickle.load(f)
+                if 'model' in data and hasattr(data['model'], 'tree_'):
+                    # Adjust the node array dtype by removing 'missing_go_to_left'
+                    tree = data['model'].tree_
+                    if hasattr(tree, 'nodes'):
+                        expected_dtype = [('left_child', '<i8'), ('right_child', '<i8'), ('feature', '<i8'), 
+                                        ('threshold', '<f8'), ('impurity', '<f8'), ('n_node_samples', '<i8'), 
+                                        ('weighted_n_node_samples', '<f8')]
+                        nodes = tree.nodes
+                        if nodes.dtype.names and 'missing_go_to_left' in nodes.dtype.names:
+                            # Create a new array with the expected 7 fields
+                            new_nodes = np.zeros(nodes.shape, dtype=expected_dtype)
+                            for i, name in enumerate(expected_dtype):
+                                new_nodes[name[0]] = nodes[name[0]]
+                            tree.nodes = new_nodes
+                return data
+
         # Load binary model
         try:
-            self.binary_model_data = joblib.load(binary_model_path)
+            self.binary_model_data = custom_load(binary_model_path)
             self.binary_model = self.binary_model_data['model']
             self.binary_scaler = self.binary_model_data['scaler']
             self.binary_features = self.binary_model_data['feature_names']
@@ -213,10 +235,13 @@ class CompleteCipherCloudScanner:
         except FileNotFoundError:
             print(f"❌ Binary model not found: {binary_model_path}")
             sys.exit(1)
+        except Exception as e:
+            print(f"❌ Error loading binary model: {e}")
+            sys.exit(1)
         
         # Load family model
         try:
-            self.family_model_data = joblib.load(family_model_path)
+            self.family_model_data = custom_load(family_model_path)
             print("DEBUG: family_model_data keys:", self.family_model_data.keys())
             self.family_model = self.family_model_data['model']
             self.family_scaler = self.family_model_data['scaler']
@@ -232,6 +257,9 @@ class CompleteCipherCloudScanner:
         except FileNotFoundError:
             print(f"❌ Family model not found: {family_model_path}")
             print("Note: Only binary classification will be available")
+            self.family_model = None
+        except Exception as e:
+            print(f"❌ Error loading family model: {e}")
             self.family_model = None
         
         # Initialize extractors
