@@ -2,45 +2,41 @@ import json
 import torch
 import re
 import sys
-sys.path.append("/content/CipherCloud-IAM-Policy-Risk-Analyzer/Scanners")
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
+sys.path.append("/kaggle/working/CipherCloud-IAM-Policy-Risk-Analyzer/Scanners")
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from peft import PeftModel, LoraConfig, TaskType
 from Complete_Scanner import CompleteCipherCloudScanner
 
-device = 0 if torch.cuda.is_available() else -1  # GPU if available, else CPU
-print(f"⚡ Using device: {'GPU' if device >= 0 else 'CPU'}")
+# Verify GPU availability
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"⚡ Using device: {'GPU' if torch.cuda.is_available() else 'CPU'}")
 
 # Paths
-base_model_id = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
-checkpoint_path = "/content/results/checkpoint-750"  # Corrected checkpoint path from Colab
+base_model_id = "facebook/opt-1.3b"
+checkpoint_path = "/kaggle/working/CipherCloud-IAM-Policy-Risk-Analyzer/results/checkpoint-10"
 
-# Load tokenizer from the trained checkpoint
+# Load tokenizer from the fine-tuned directory
 print("Loading tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(
-    checkpoint_path,
+    checkpoint_path,  # Load from the checkpoint directory where it was saved
     use_fast=False,
     trust_remote_code=True,
-    local_files_only=True  # Ensure local loading
+    local_files_only=True
 )
 
-# Configure 8-bit quantization
-quantization_config = BitsAndBytesConfig(
-    load_in_8bit=True
-)
-
-# Load base model with 8-bit quantization
+# Load base model without quantization initially
 print("Loading base model...")
 model = AutoModelForCausalLM.from_pretrained(
     base_model_id,
-    quantization_config=quantization_config,  # Use BitsAndBytesConfig
-    device_map="auto",  # Automatically distribute across GPU/CPU
+    torch_dtype=torch.float16,  # Match training dtype
+    device_map="auto",
     trust_remote_code=True
 )
 
 # Resize token embeddings to match tokenizer
 model.resize_token_embeddings(len(tokenizer))
 
-# Configure LoRA with training settings (match original q_proj, v_proj)
+# Configure LoRA with training settings
 lora_config = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
     r=8,
@@ -58,32 +54,29 @@ model = PeftModel.from_pretrained(
     config=lora_config
 )
 
-# Set model to evaluation mode
-model.eval()
+# Move model to device
+model.to(device)
+model.eval()  # Set model to evaluation mode
 
-# Create pipeline without explicit device argument
+# Create pipeline
 print("Creating inference pipeline...")
 llm = pipeline(
     "text-generation",
     model=model,
     tokenizer=tokenizer,
-    dtype=torch.float32
+    # Remove explicit dtype, let it infer from model
 )
 
 def rewrite_policy(policy_json: dict) -> str:
     """
     Rewrite risky IAM policies using HuggingFace DeepSeek model with strict JSON output.
     """
-    prompt = f"""Rewrite this risky IAM policy to be secure while preserving necessary permissions:    
-
+    prompt = f"""Rewrite this risky IAM policy to be secure while preserving necessary permissions:
 Input:
 {json.dumps(policy_json, indent=2)}
-
 Output:"""
-
     result = llm(prompt, max_new_tokens=512, temperature=0.2)
     result_text = result[0].get("generated_text", "").strip()
-
     # --- JSON Safety Net with Debugging ---
     print("Raw LLM Output:", result_text)  # Debug the raw output
     try:
@@ -98,17 +91,14 @@ Output:"""
             except Exception:
                 return "{}"
         return "{}"
-    
+
 def main():
     scanner = CompleteCipherCloudScanner()
-
     # Example: Load a policy from file
-    with open("Scanners/example_policy.json") as f:
+    with open("/kaggle/working/CipherCloud-IAM-Policy-Risk-Analyzer/Scanners/example_policy.json") as f:
         policy = json.load(f)
-
     # Step 1: Run binary + family scan
     scan_result = scanner.complete_scan(policy)
-
     # Step 2: Rewrite risky policies
     if scan_result['binary_result']['is_risky']:
         print("🚨 Risky policy detected! Sending to LLM for rewrite...")
