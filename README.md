@@ -251,7 +251,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 This project is developed and maintained by:
 
-- **Mohamed Gamal** ([@JimmyDevvvvv](https://github.com/JimmyDevvvvv)) - *Project Lead & Core Developer*
+- **Mohamed Gamal** ([@JimmyDevvvvv](https://github.com/JimmyDevvvvv)) - *Project Lead*
 - **Ahmed Hegab** ([@AHegab](https://github.com/AHegab)) - *Collaborator*
 - **AhmedishimAplus** ([@AhmedishimAplus](https://github.com/AhmedishimAplus)) - *Collaborator*
 - **Ammar Hassona** ([@AmmarHassona](https://github.com/AmmarHassona)) - *Collaborator*
@@ -259,7 +259,7 @@ This project is developed and maintained by:
 - **Abdulrahman Alawbathani** ([@VizardeX](https://github.com/VizardeX)) - *Collaborator*
 - **Yehia Fadly** ([@Yehia3A](https://github.com/Yehia3A)) - *Collaborator*
 
-*A passionate team of cybersecurity engineers working at the intersection of machine learning and cloud security.*
+*A passionate team of students working at the intersection of machine learning and cloud security.*
 
 ## 🙏 Acknowledgments
 
