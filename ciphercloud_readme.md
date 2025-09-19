@@ -2,9 +2,7 @@
 
 **AI-Powered IAM Policy Risk Analyzer**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 
 CipherCloud is a modular, ML-powered cloud IAM policy analyzer that detects risky permissions, classifies threats by attack family, and automatically rewrites unsafe IAM policies using fine-tuned language models. Built from the ground up to understand the attack surface of IAM roles and policies through machine learning and AI-driven remediation.
 
@@ -249,11 +247,19 @@ flake8 .
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
+## 👨‍💻 Authors & Contributors
 
-**Mohamed Gamal** ([@JimmyDevvvvv](https://github.com/JimmyDevvvvv))
+This project is developed and maintained by:
 
-*Cybersecurity engineer passionate about AI-driven defense, policy hardening, and the intersection of machine learning and cloud security.*
+- **Mohamed Gamal** ([@JimmyDevvvvv](https://github.com/JimmyDevvvvv)) - *Project Lead & Core Developer*
+- **Ahmed Hegab** ([@AHegab](https://github.com/AHegab)) - *Collaborator*
+- **AhmedishimAplus** ([@AhmedishimAplus](https://github.com/AhmedishimAplus)) - *Collaborator*
+- **Ammar Hassona** ([@AmmarHassona](https://github.com/AmmarHassona)) - *Collaborator*
+- **Abdullah Mohamed** ([@Sicariusa](https://github.com/Sicariusa)) - *Collaborator*
+- **Abdulrahman Alawbathani** ([@VizardeX](https://github.com/VizardeX)) - *Collaborator*
+- **Yehia Fadly** ([@Yehia3A](https://github.com/Yehia3A)) - *Collaborator*
+
+*A passionate team of cybersecurity engineers working at the intersection of machine learning and cloud security.*
 
 ## 🙏 Acknowledgments
 
@@ -265,7 +271,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - 🐛 **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/CipherCloud/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/CipherCloud/discussions)
-- 📧 **Email**: your.email@domain.com
+- 📧 **Contact**: For questions and support, please open an issue
 
 ---
 
