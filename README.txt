@@ -1,4 +1,4 @@
-# ☁️ CipherCloud: AI-Powered IAM Policy Risk Analyzer
+#☁️ CipherCloud: AI-Powered IAM Policy Risk Analyzer
 
 **CipherCloud** is a modular, ML-powered cloud IAM policy analyzer that detects risky permissions, classifies threats by attack family, and rewrites unsafe IAM policies using a fine-tuned LLM. It was inspired by tools like PMapper, CloudSplaining, and IAM Access Analyzer, but rebuilt from scratch to deeply understand the attack surface of IAM roles and policies through machine learning and AI-driven remediation.
 
