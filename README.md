@@ -1,191 +1,128 @@
-# CipherCloud ☁️
+# CipherCloud: IAM Policy Risk Analyzer
 
-**AI-Powered IAM Policy Risk Analyzer**
+A machine learning system for analyzing AWS IAM policies to identify risky permissions and generate safer alternatives.
 
+## Overview
 
+CipherCloud analyzes IAM policies using machine learning classifiers to detect dangerous permission combinations and automatically suggests policy improvements. The system uses both binary classification (safe/risky) and multi-class classification to categorize specific attack vectors.
 
-CipherCloud is a modular, ML-powered cloud IAM policy analyzer that detects risky permissions, classifies threats by attack family, and automatically rewrites unsafe IAM policies using fine-tuned language models. Built from the ground up to understand the attack surface of IAM roles and policies through machine learning and AI-driven remediation.
+## Core Components
 
-## 🎯 Overview
+- **Binary Classifier**: Determines if a policy contains risky permissions
+- **Attack Family Classifier**: Categorizes threats into specific attack types
+- **Policy Rewriter**: Generates safer policy alternatives using fine-tuned language models
+- **CLI Scanner**: Command-line interface for batch analysis
+- **Dataset Generators**: Creates synthetic training data
 
-Unlike traditional static scanners, CipherCloud is an AI-backed defense and educational engine that:
-- **Detects** risky IAM policies with high accuracy
-- **Explains** why policies are dangerous and what attacks they enable
-- **Fixes** them automatically with intelligent rewrites
-- **Educates** users on IAM security best practices
-
-Inspired by tools like PMapper, CloudSplaining, and IAM Access Analyzer, but enhanced with modern ML/AI capabilities.
-
-## ✨ Key Features
-
-| Feature | Description |
-|---------|-------------|
-| 🔍 **Binary Risk Scanner** | Classifies policies as *Safe* or *Risky* using ML |
-| 🧠 **Attack Family Classifier** | Categorizes threats into 10+ attack types |
-| ✍️ **AI Policy Rewriter** | Generates safer policy versions using fine-tuned LLMs |
-| 📊 **Explainability Engine** | Provides detailed reasoning for risk assessments |
-| 🚀 **CLI Scanner** | Batch scan and analyze multiple policies |
-| 🧱 **Synthetic Data Generator** | Creates realistic training datasets |
-
-## 🎬 Demo
+## Installation
 
 ```bash
-$ python Scanners/Complete_Scanner.py policies/risky-policy.json
+git clone https://github.com/JimmyDevvvvv/CipherCloud-IAM-Policy-Risk-Analyzer.git
+cd CipherCloud-IAM-Policy-Risk-Analyzer
 
-🔍 Analyzing: risky-policy.json
-✅ Status: RISKY (Confidence: 94.2%)
-📂 Attack Family: Privilege Escalation
-⚠️  Risk Factors:
-   • Allows iam:PassRole with ec2:RunInstances
-   • Overly broad resource permissions (*) 
-   • Missing condition constraints
-
-💡 AI-Generated Fix:
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Action": ["ec2:DescribeInstances"],
-    "Resource": "arn:aws:ec2:*:*:instance/i-1234567890abcdef0"
-  }]
-}
-
-📁 Rewritten policy saved to: rewrites/risky-policy_fixed.json
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.11 or higher
-- pip package manager
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/YOUR_USERNAME/CipherCloud.git
-cd CipherCloud
-
-# Create and activate virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
 
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-### Basic Usage
+## Usage
 
+Basic policy analysis:
 ```bash
-# Quick binary scan
 python Scanners/Binary_Scanner.py policies/example.json
+```
 
-# Complete analysis with AI rewrite
+Complete analysis with rewrite suggestions:
+```bash
 python Scanners/Complete_Scanner.py policies/example.json
+```
 
-# Batch scan multiple policies
+Batch processing:
+```bash
 python Scanners/Batch_Scanner.py policies/
 ```
 
-## 📁 Project Structure
+## Directory Structure
 
 ```
 CipherCloud/
-├── 📂 Binary Dataset/           # Safe vs Risky policy training data
-├── 📂 Classifier Dataset/       # Multi-class attack-labeled policies  
-├── 📂 Generators/              # Synthetic policy generators
-├── 📂 Models/                  # ML classifiers & LLM fine-tuning
-├── 📂 Scanners/               # CLI analysis tools
-├── 📂 policies/               # Sample IAM policies for testing
-├── 📂 rewrites/              # AI-generated policy fixes
-├── 📂 utils/                 # Shared utilities & feature extraction
-├── 📄 README.md
-├── 📄 requirements.txt
-└── 📄 LICENSE
+├── Binary Dataset/      # Binary classification training data
+├── Classifier Dataset/  # Multi-class training data
+├── Generators/         # Synthetic data generation
+├── Models/            # ML model training scripts
+├── Scanners/          # Analysis tools
+├── policies/          # Sample policies
+├── rewrites/          # Generated policy fixes
+└── utils/             # Shared utilities
 ```
 
-## 🛠 Technical Architecture
+## Attack Categories
 
-### ML Pipeline
-1. **Feature Extraction** → Extract policy attributes using TF-IDF and custom features
-2. **Binary Classification** → Determine if policy is Safe/Risky
-3. **Attack Classification** → Categorize into specific threat families
-4. **AI Remediation** → Generate secure policy alternatives
+The system identifies these attack patterns:
 
-### Attack Categories
+- **Privilege Escalation**: Gaining higher privileges through permission combinations
+- **Shadow Admin**: Near-administrative access without obvious indicators
+- **Persistence**: Mechanisms for maintaining long-term access
+- **Data Exfiltration**: Unauthorized access to sensitive data
+- **Lateral Movement**: Cross-service or cross-account access
+- **Service Abuse**: Misuse of AWS services for malicious purposes
+- **KMS Abuse**: Unauthorized encryption/decryption operations
+- **Secrets Theft**: Access to credentials and sensitive parameters
+- **Destructive Actions**: Permissions that can cause service disruption
+- **Policy Backdooring**: Subtle modifications to existing policies
 
-| Family | Description | Example |
-|--------|-------------|---------|
-| 🚀 **Privilege Escalation** | Ability to gain higher privileges | `iam:PassRole` + `ec2:RunInstances` |
-| 👤 **Shadow Admin** | Near-admin access without detection | Multiple high-privilege services |
-| 🔒 **Persistence** | Maintaining long-term access | Creating backdoor users/roles |
-| 📊 **Data Exfiltration** | Unauthorized data access | Broad S3/RDS read permissions |
-| ↔️ **Lateral Movement** | Cross-service/account access | AssumeRole to other accounts |
-| 🔧 **Service Abuse** | Misuse of AWS services | Lambda code injection vectors |
-| 🔐 **KMS Abuse** | Encryption key manipulation | Decrypt/encrypt with customer keys |
-| 🗝️ **Secrets Theft** | Access to sensitive credentials | SecretsManager/Parameter Store |
-| 💥 **DoS/Destructive** | Resource deletion/disruption | Delete permissions on critical resources |
-| 🔙 **Policy Backdooring** | Hidden policy modifications | Subtle permission additions |
+## Technical Implementation
 
-### Technology Stack
+**Machine Learning Pipeline:**
+1. Feature extraction using TF-IDF and custom policy features
+2. Binary classification for initial risk assessment
+3. Multi-class classification for attack categorization
+4. Language model fine-tuning for policy rewriting
 
-| Component | Technology |
-|-----------|------------|
-| **ML Framework** | scikit-learn, joblib |
-| **LLM Fine-tuning** | transformers, peft (LoRA) |
-| **Data Processing** | pandas, numpy |
-| **CLI Interface** | argparse, rich |
-| **Serialization** | json, pickle |
+**Technology Stack:**
+- scikit-learn and joblib for ML models
+- transformers library for language model fine-tuning
+- pandas and numpy for data processing
+- argparse and rich for CLI interface
 
-## 📚 Advanced Usage
+## Training Custom Models
 
-### Training Custom Models
-
+Generate training data:
 ```bash
-# Generate synthetic training data
 python Generators/PolicyGenerator.py --samples 5000 --output datasets/
+```
 
-# Train binary classifier
+Train classifiers:
+```bash
 python Models/train_binary_classifier.py --data datasets/binary/
-
-# Train attack family classifier  
 python Models/train_family_classifier.py --data datasets/classifier/
+```
 
-# Fine-tune LLM for policy rewriting
+Fine-tune language model:
+```bash
 python Models/finetune_llm.py --model falcon-7b --data datasets/rewrites/
 ```
 
-### Batch Analysis
+## Performance
 
-```bash
-# Scan entire directory
-python Scanners/Batch_Scanner.py policies/ --output results.csv
+Current model performance on test datasets:
 
-# Generate risk report
-python utils/generate_report.py --input results.csv --format html
-```
+| Metric | Binary Classifier | Family Classifier |
+|--------|------------------|-------------------|
+| Accuracy | 94.2% | 89.7% |
+| Precision | 93.8% | 88.4% |
+| Recall | 94.6% | 90.1% |
+| F1-Score | 94.2% | 89.2% |
 
-## 🧪 Dataset Generation
+## Configuration
 
-CipherCloud includes sophisticated synthetic data generators:
-
-- **10+ Attack Families** with realistic policy templates
-- **Configurable Risk Levels** from low to critical
-- **AWS Service Coverage** across 50+ services
-- **Balanced Datasets** with proper class distribution
-
-```bash
-python Generators/PolicyGenerator.py --family privilege_escalation --count 1000
-```
-
-## 🔧 Configuration
-
-Create a `config.yaml` file to customize behavior:
+Create `config.yaml` to customize behavior:
 
 ```yaml
 models:
   binary_classifier: "models/binary_clf.joblib"
-  family_classifier: "models/family_clf.joblib" 
+  family_classifier: "models/family_clf.joblib"
   llm_model: "microsoft/DialoGPT-medium"
 
 thresholds:
@@ -198,87 +135,41 @@ output:
   format: "json"
 ```
 
-## 📊 Performance Metrics
+## Known Limitations
 
-| Metric | Binary Classifier | Family Classifier |
-|--------|------------------|-------------------|
-| **Accuracy** | 94.2% | 89.7% |
-| **Precision** | 93.8% | 88.4% |
-| **Recall** | 94.6% | 90.1% |
-| **F1-Score** | 94.2% | 89.2% |
+- Language model outputs may contain JSON syntax errors
+- Policy rewrites require manual review before production use
+- No direct AWS API integration
+- Limited to AWS IAM policies (no Azure/GCP support)
 
-## 🤝 Contributing
+## Development
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Setup
-
+Install development dependencies:
 ```bash
-# Install development dependencies
 pip install -r requirements-dev.txt
+```
 
-# Run tests
+Run tests:
+```bash
 pytest tests/
+```
 
-# Format code
+Code formatting:
+```bash
 black .
-
-# Lint code  
 flake8 .
 ```
 
-## 🐛 Known Limitations
+## Contributors
 
-- LLM rewrites may occasionally produce invalid JSON syntax
-- Rewrites require manual review for production use
-- No real-time AWS API integration (planned for v2.0)
-- Policy diff visualization not yet implemented
+- Mohamed Gamal (@JimmyDevvvvv)
+- Ahmed Hegab (@AHegab)
+- AhmedishimAplus (@AhmedishimAplus)
+- Ammar Hassona (@AmmarHassona)
+- Abdullah Mohamed (@Sicariusa)
+- Abdulrahman Alawbathani (@VizardeX)
+- Yehia Fadly (@Yehia3A)
 
-## 🗺️ Roadmap
+## License
 
-- [ ] Real-time AWS IAM role scanning
-- [ ] Policy diff visualization
-- [ ] Web dashboard interface
-- [ ] Integration with AWS Config Rules
-- [ ] Support for Azure and GCP policies
-- [ ] Advanced explainable AI features
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Authors & Contributors
-
-This project is developed and maintained by:
-
-- **Mohamed Gamal** ([@JimmyDevvvvv](https://github.com/JimmyDevvvvv)) - *Project Lead*
-- **Ahmed Hegab** ([@AHegab](https://github.com/AHegab)) - *Collaborator*
-- **AhmedishimAplus** ([@AhmedishimAplus](https://github.com/AhmedishimAplus)) - *Collaborator*
-- **Ammar Hassona** ([@AmmarHassona](https://github.com/AmmarHassona)) - *Collaborator*
-- **Abdullah Mohamed** ([@Sicariusa](https://github.com/Sicariusa)) - *Collaborator*
-- **Abdulrahman Alawbathani** ([@VizardeX](https://github.com/VizardeX)) - *Collaborator*
-- **Yehia Fadly** ([@Yehia3A](https://github.com/Yehia3A)) - *Collaborator*
-
-*A passionate team of students working at the intersection of machine learning and cloud security.*
-
-## 🙏 Acknowledgments
-
-- Inspired by [PMapper](https://github.com/nccgroup/PMapper), [CloudSplaining](https://github.com/salesforce/cloudsplaining), and AWS IAM Access Analyzer
-- Special thanks to the open-source security community
-- Built with ❤️ for cloud security practitioners
-
-## 📞 Support
-
-- 🐛 **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/CipherCloud/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/CipherCloud/discussions)
-- 📧 **Contact**: For questions and support, please open an issue
-
----
-
-<div align="center">
-
-**⭐ Star this repo if you find it useful! ⭐**
-
-[Report Bug](https://github.com/YOUR_USERNAME/CipherCloud/issues) · [Request Feature](https://github.com/YOUR_USERNAME/CipherCloud/issues) · [Documentation](https://github.com/YOUR_USERNAME/CipherCloud/wiki)
-
-</div>
+MIT License - see LICENSE file for details.
