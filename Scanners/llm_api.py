@@ -32,7 +32,7 @@ def secure_rewrite(risky_policy: dict, max_attempts: int = 3):
             )
 
             # Wait for result (increase timeout if needed)
-            result = job.result(timeout=300)
+            result = job.result(timeout=5000)
 
         except concurrent.futures.CancelledError:
             print("❌ Request was cancelled (Space too slow or sleeping).")
