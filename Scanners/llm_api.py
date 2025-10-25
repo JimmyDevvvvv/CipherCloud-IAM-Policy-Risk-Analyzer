@@ -1,6 +1,12 @@
 import json
 import concurrent.futures
 from gradio_client import Client
+import sys
+import pathlib
+repo_root = pathlib.Path(__file__).resolve().parents[1]
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
+
 from Scanners.Complete_Scanner import CompleteCipherCloudScanner
 
 # Initialize Hugging Face client
@@ -58,6 +64,7 @@ def secure_rewrite(risky_policy: dict, max_attempts: int = 3):
 
 
 if __name__ == "__main__":
+    # Example risky policy
     risky_policy = {
         "Version": "2012-10-17",
         "Statement": [
@@ -72,6 +79,8 @@ if __name__ == "__main__":
         ]
     }
 
-    
+    # Calling the secure_rewrite function
     safe_policy = secure_rewrite(risky_policy)
+
+    # Output the final safe policy
     print("\n🔒 Secure Policy Output:\n", json.dumps(safe_policy, indent=2))
